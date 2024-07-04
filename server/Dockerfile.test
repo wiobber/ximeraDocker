@@ -1,0 +1,40 @@
+FROM node:12 as cacher 
+WORKDIR /usr/var/server
+COPY cached-package.json  /usr/var/server/package.json
+COPY cached-package-lock.json  /usr/var/server/package-lock.json
+RUN npm config set python /usr/bin/python
+RUN npm install --unsafe-perm
+
+FROM node:12 as installer 
+WORKDIR /usr/var/server
+COPY package*.json  /usr/var/server
+RUN npm config set python /usr/bin/python
+COPY --from=cacher /usr/var/server/node_modules node_modules
+RUN npm install --unsafe-perm
+COPY siunitx.js node_modules/mathjax/extensions/TeX
+# replaces napa install
+RUN git clone https://github.com/tchapi/pagedown-bootstrap.git node_modules/pagedown-bootstrap 
+
+FROM node:12
+RUN apt-get update
+RUN apt-get install -y curl git libcurl4-gnutls-dev libgit2-dev libssl-dev
+RUN apt-get install -y mongodb redis-server
+RUN npm config set python /usr/bin/python
+WORKDIR /usr/var/server
+
+COPY --from=installer /usr/var/server/node_modules node_modules
+
+# Copy everything over (but  it might be over-mounted at runtime!)
+COPY . /usr/var/server
+
+# Add the updated package files
+COPY --from=installer /usr/var/server/package* .
+
+VOLUME /data/db
+
+RUN apt-get install -y vim
+
+RUN npm run build
+
+CMD bash start.sh
+

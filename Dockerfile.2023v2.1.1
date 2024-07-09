@@ -1,0 +1,88 @@
+FROM texlive/texlive:TL2023-historic
+
+RUN apt-get update -y  && apt-get upgrade -y
+
+# Build tools
+RUN apt-get install -y make cmake pkg-config
+## RUN apt-get install -y perl-modules
+RUN apt-get install -y curl git
+#RUN apt-get install -y curl git libcurl3-gnutls 
+RUN apt-get install -y golang-go
+
+# Nice/needed  things
+RUN apt-get install -y mupdf-tools pdf2svg imagemagick libncurses6
+RUN apt-get install -y vim wget strace gnupg
+
+
+# ENV PATH="${PATH}:/opt/texlive/bin/x86_64-linux"
+
+# SageMath
+# RUN DEBIAN_FRONTEND=noninteractive apt-get -y install sagemath
+
+# Install node and MathJaxTest
+# WORKDIR /root
+# RUN apt-get install -y nodejs npm
+# ADD htmlMathJaxTest /root/htmlMathJaxTest
+# RUN cd /root/htmlMathJaxTest && npm install
+
+# Install git2go 
+RUN mkdir -p /root/go/src/github.com/libgit2
+WORKDIR /root/go/src/github.com/libgit2
+RUN git clone https://github.com/libgit2/git2go.git
+WORKDIR git2go
+RUN git submodule update --init
+
+RUN apt-get install -y python3 
+
+RUN make install-static
+
+ENV GOPATH=/root/go
+ENV PKG_CONFIG_PATH=/root/go/src/github.com/libgit2/git2go/static-build/install/lib/pkgconfig
+ENV CGO_CFLAGS=-I/root/go/src/github.com/libgit2/git2go/static-build/install/include
+
+# Build and install xake
+RUN mkdir -p /root/go/src/github.com/ximeraproject/xake
+# -> Build from local xake directory !
+ADD xake /root/go/src/github.com/ximeraproject/xake 
+####ADD . /root/go/src/github.com/ximeraproject/xake
+####RUN git status
+
+# -> Build from a specific repo/branch
+# RUN git clone https://gitlab.kuleuven.be/monitoraat-wet/xake.git
+# WORKDIR xake
+# RUN git checkout make4ht
+
+
+WORKDIR /root/go/src/github.com/ximeraproject/xake
+RUN go mod init
+RUN go mod tidy
+RUN go install . 
+RUN ln -s /root/go/bin/xake /usr/bin/xake
+
+# Install node and MathJaxTest
+# WORKDIR /root
+RUN apt-get install -y nodejs npm
+# ADD htmlMathJaxTest /root/htmlMathJaxTest
+RUN ln -s /root/go/src/github.com/ximeraproject/xake/htmlMathJaxTest /root/htmlMathJaxTest
+RUN cd /root/htmlMathJaxTest && npm install
+
+# Add ximeraLatex repo
+RUN mkdir -p /root/texmf/tex/latex
+WORKDIR /root/texmf/tex/latex
+RUN git clone https://github.com/XimeraProject/ximeraLatex.git 
+WORKDIR /root/texmf/tex/latex/ximeraLatex
+# RUN git checkout combined
+
+
+RUN apt-get install git-restore-mtime
+
+ADD scripts/xmlatex /usr/local/bin/xmlatex
+ADD scripts/build.sh /usr/local/bin/build.sh
+RUN ln -s /root/go/bin/xake /usr/local/bin/xake
+
+RUN git config --global user.name "Xake Container"
+RUN git config --global user.email "xake@xake.test" 
+
+RUN git config --global --add safe.directory /code
+
+WORKDIR /code

@@ -4,8 +4,8 @@ on:
   push:
     branches: [ "master" ]
     paths:
-      - 'Dockerfile.2019'
-      - 'Dockerfile.2023'
+      - 'xake/Dockerfile.2019'
+      - 'xake/Dockerfile.2023'
   # pull_request:
   #   branches: [ "master" ]
 
@@ -18,9 +18,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image 2019
-      run: docker build . --file Dockerfile.2019 --tag ghcr.io/ximeraproject/xake2019:latest
+      run: docker build . --file xake/Dockerfile.2019 --tag ghcr.io/ximeraproject/xake2019:latest
     - name: Build the Docker image 2023
-      run: docker build . --file Dockerfile.2023 --tag ghcr.io/ximeraproject/xake2023:latest
+      run: docker build . --file xake/Dockerfile.2023 --tag ghcr.io/ximeraproject/xake2023:latest
 
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

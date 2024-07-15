@@ -6,12 +6,18 @@
 #  - optionally gets you a shell inside the container
 #  - optionally automates lots of other things
 
-# Set environment variable 'export DEBUG=1' and/or use -d option for debugging/tracing
+# Note: set environment variable 'export DEBUG=1' and/or use -d option for debugging/tracing
 
+#
+# Set some defaults
+#
 # default docker image to run; overwrite with 'export XAKE_IMAGE=myxake:0.1'
-: "${XAKE_IMAGE:=ghcr.io/ximeraproject/xake2023:v2.1}"
+: "${XAKE_IMAGE:=ghcr.io/ximeraproject/xake2023:v2.1.1}"
 # Which folder to mount INSIDE the container, under /code  (use with care: it should contain a build.sh !)
 : "${MOUNTDIR:=$(pwd)}"
+# Which script to start inside the container; only usefull for OLD xkae-images, which used a now obsolete build.sh script
+: "${XMLATEX:=xmlatex}"
+# : "${XMLATEX:=./build.sh}"
 
 if [[ -f /.dockerenv ]]  
 then
@@ -35,14 +41,14 @@ else
     fi
 
     echo "Restarting myself in docker (from image $XAKE_IMAGE)"	
-    [[ -n "$DEBUG" ]] && echo  docker run --env LOCAL_IP --env URL_XIMERA --env REPO_XIMERA --env GPG_KEY --env GPG_KEY_ID --network host --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/code $XAKE_IMAGE ./build.sh $*
-    docker run --env LOCAL_IP --env URL_XIMERA --env REPO_XIMERA --env GPG_KEY --env GPG_KEY_ID --network host --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/code $XAKE_IMAGE ./build.sh $*
+    [[ -n "$DEBUG" ]] && echo  docker run --env LOCAL_IP --env URL_XIMERA --env REPO_XIMERA --env GPG_KEY --env GPG_KEY_ID --network host --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/code $XAKE_IMAGE $XMLATEX $*
+    docker run --env LOCAL_IP --env URL_XIMERA --env REPO_XIMERA --env GPG_KEY --env GPG_KEY_ID --network host --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/code $XAKE_IMAGE $XMLATEX $*
     exit 
 fi
 
 # We're for sure running in a container now
 
-echo "Starting $0 $*"
+echo "Starting $0 $* (inside container) "
 
 # utility functions for errorhandling/debugging (and logging to be added ...?)
 error() {
@@ -143,10 +149,14 @@ if [[ -d .ximera_local ]]; then
     cp -r .ximera_local/* /root/texmf/tex/latex/ximeraLatex
 fi
 
-# Hack: some versions of xake start THIS VERY SCRIPT again (instead of hardcoded commands inside the xake-executable)
-# Some KULeuven versions used an adhoc script 'mypdflatex' instead
-PATH=$(pwd):$PATH
+# Hack: recent versions of xake start THIS VERY SCRIPT again (instead of hardcoded commands inside the xake-executable)
+# Some OLD (KULeuven) versions used an adhoc script 'mypdflatex' instead, which sometimes was not 'executable'
 [[ -f mypdflatex ]] && chmod +x mypdflatex
+
+# Make sure the current ('base')-directory is in the path. 
+# This allows for LOCAL versions of xmlatex or other things to OVERWRITE whatever is in the container.
+# To be used with care ...
+PATH=$(pwd):$PATH
 
 # Longer lines in pdflatex output
 export max_print_line=1000
@@ -155,7 +165,7 @@ export half_error_line=238
 
 
 # After git clone, ALL files seem recent; try to reset them (to prevent baking all files all the time)
-#  (needed in gillab CI/CD ...)
+#  (needed in gitlab CI/CD ...)
 reset_file_times() {
  if find . -maxdepth 1 -name "*.tex" -mtime +1 | grep .
  then
@@ -325,6 +335,20 @@ then
 elif [[ "$COMMAND" == "serve" ]]
 then
     echo "xake serve"
+
+
+    if [[ -z "$GPG_KEY_ID" ]]
+    then
+        if [[ -f .ximeraserve ]]
+        then
+            echo "Using settings from .ximeraserve"
+            source .ximeraserve
+        fi
+        if [[ -z "$GPG_KEY_ID" ]]   # still no key ...
+        then
+            error "No GPG_KEY_ID set; serving is not possible."
+        fi
+    fi
     debug "Loading GPG Key"
     if [[ -f "$GPG_KEY" ]]
     then
@@ -335,13 +359,13 @@ then
             debug "Importing base64-encode private key from $GPG_KEY"
             cat $GPG_KEY | base64 --decode > .gpg # decode the base64 gpg key
             gpg -q $VERBOSE --import .gpg ||  error "gpg --import failed (encoded key)"
-            rm .gpg # remove the gpg key so he is certainly not cached
+            rm .gpg # remove the gpg key so it is certainly not cached
         fi
     else 
         echo  "Importing private key in variable GPG_KEY"
         echo "$GPG_KEY" >.gpg # | base64 --decode > .gpg # decode the base64 gpg key
         gpg -q $VERBOSE --import .gpg  || error "gpg --import failed (key itself in variable)"
-        rm .gpg # remove the gpg key so he is certainly not cached
+        rm .gpg # remove the gpg key so it is certainly not cached
     fi
     [[ -n "$DEBUG" ]] && gpg --list-keys
     debug "KEYSERVER gpg $VERBOSE --keyserver $URL_XIMERA --send-key $GPG_KEY_ID"

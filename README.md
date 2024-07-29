@@ -13,7 +13,7 @@ Typically Ximera-authors will *use* existing Docker images, e.g. as found via
 
 
 To publish your repo to a ximera-server with the `xmlatex` script as provided in e.g. the ximeraFirstSteps repo, you need to generate a personal GPG key,
-and put it in a .ximerserve file  (example in ximeraFirstSteps)
+and put it in a .ximeraserve file  (example in ximeraFirstSteps)
 
 Alternatively or additionally, you can overwrite that and export the key to a file, e.g. `gpgkey`, and export following environment variables:
   

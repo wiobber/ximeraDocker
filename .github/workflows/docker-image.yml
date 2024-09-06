@@ -4,8 +4,9 @@ on:
   push:
     branches: [ "master" ]
     paths:
-      - 'xake/Dockerfile.2019'
-      - 'xake/Dockerfile.2023'
+      # - 'xake/Dockerfile.2019'
+      # - 'xake/Dockerfile.2023'
+      - 'xake/Dockerfile.2024'
   # pull_request:
   #   branches: [ "master" ]
 
@@ -17,16 +18,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image 2019
-      run: docker build . --file xake/Dockerfile.2019 --tag ghcr.io/ximeraproject/xake2019:latest
-    - name: Build the Docker image 2023
-      run: docker build . --file xake/Dockerfile.2023 --tag ghcr.io/ximeraproject/xake2023:latest
+    # - name: Build the Docker image 2019
+    #   run: docker build . --file xake/Dockerfile.2019 --tag ghcr.io/ximeraproject/xake2019:latest
+    # - name: Build the Docker image 2023
+    #   run: docker build . --file xake/Dockerfile.2023 --tag ghcr.io/ximeraproject/xake2023:latest
+    - name: Build the Docker image 2024
+      run: docker build . --file xake/Dockerfile.dev --tag ghcr.io/ximeraproject/xake2024:latest
 
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
      
-    - name: Push xake2019:latest
-      run: docker push ghcr.io/ximeraproject/xake2019:latest
-    - name: Push xake2023:latest
-      run: docker push ghcr.io/ximeraproject/xake2023:latest
+    # - name: Push xake2019:latest
+    #   run: docker push ghcr.io/ximeraproject/xake2019:latest
+    # - name: Push xake2023:latest
+    #   run: docker push ghcr.io/ximeraproject/xake2023:latest
+    - name: Push xake2024:latest
+      run: docker push ghcr.io/ximeraproject/xake2024:latest
      

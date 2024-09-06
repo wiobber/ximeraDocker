@@ -98,11 +98,11 @@ while getopts ":hitds" opt; do
 	This script is a (docker-)wrapper to 'xake', and contains some extra convenience-functions for building pdf's.
 	
 	Usage:
-        ./build.sh compile path/to/file.tex
-        ./build.sh compilePdf path/to/file.tex
-        ./build.sh bake
-        ./build.sh serve     (does ALSO do frost and setup gpg-keys ...!)
-        ./build.sh -i bash   (start a shell inside the container)
+        xmlatex compile path/to/file.tex
+        xmlatex compilePdf path/to/file.tex
+        xmlatex bake
+        xmlatex serve     (does ALSO do frost and setup gpg-keys ...!)
+        xmlatex -i bash   (start a shell inside the container)
 	   
 EOF
        exit 0
@@ -219,8 +219,8 @@ then
     debug pdflatex -file-line-error -shell-escape "\\PassOptionsToClass{tikzexport}{ximera}\\PassOptionsToClass{xake}{ximera}\\PassOptionsToClass{xake}{xourse}\\nonstopmode\\input{$FILE}"
           pdflatex -file-line-error -shell-escape "\\PassOptionsToClass{tikzexport}{ximera}\\PassOptionsToClass{xake}{ximera}\\PassOptionsToClass{xake}{xourse}\\nonstopmode\\input{$FILE}"
 
-    debug make4ht -s -c ximera -f xhtml -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" 
-          make4ht -s -c ximera -f xhtml -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
+    debug make4ht -s -c ximera -f html5/dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" 
+          make4ht -s -c ximera -f html5+dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
     # make4ht -s -c ximera -f xhtml+tidy -u  -a debug $FILE "svg,htex4ht, mathjax,-css,Gin-percent,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
     # make4ht  $FILE "ximera,charset=utf-8,-css" "-cunihtf -utf8" "" "--interaction=nonstopmode -shell-escape -file-line-error"
     # htlatex $FILE "ximera,charset=utf-8,-css" "-cunihtf -utf8" "" "--interaction=nonstopmode -shell-escape -file-line-error"
@@ -424,7 +424,7 @@ then
 else
     # Hope that 'xake $*' was intended ...; if not, xake will complain.
     echo "Starting xake $*"
-    xake $*
+    $XAKE $*
 fi
 
 #exit 0; % would ignore (some) errors; might be relevant in CI/CD context

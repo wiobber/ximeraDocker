@@ -1,5 +1,6 @@
 # FROM texlive/texlive
-FROM texlive/texlive:TL2024-historic
+FROM registry.gitlab.com/islandoftex/images/texlive:TL2024-2024-05-26-full
+
 
 RUN apt-get update -y  && apt-get upgrade -y
 

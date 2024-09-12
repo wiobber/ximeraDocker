@@ -1,5 +1,5 @@
-FROM texlive/texlive
-## FROM texlive/texlive:TL2023-historic
+# FROM texlive/texlive
+FROM texlive/texlive:TL2024-historic
 
 RUN apt-get update -y  && apt-get upgrade -y
 

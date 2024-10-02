@@ -66,6 +66,10 @@ RUN apt-get install -y nodejs npm
 RUN ln -s /root/go/src/github.com/ximeraproject/xake/htmlMathJaxTest /root/htmlMathJaxTest
 RUN cd /root/htmlMathJaxTest && npm install
 
+# SageMath
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install sagemath
+
+
 # Add ximeraLatex repo
 RUN mkdir -p /root/texmf/tex/latex
 WORKDIR /root/texmf/tex/latex
@@ -77,7 +81,6 @@ WORKDIR /root/texmf/tex/latex/ximeraLatex
 RUN apt-get install git-restore-mtime
 
 ADD scripts/xmlatex /usr/local/bin/xmlatex
-ADD scripts/build.sh /usr/local/bin/build.sh
 RUN ln -s /root/go/bin/xake /usr/local/bin/xake
 
 RUN git config --global user.name "Xake Container"

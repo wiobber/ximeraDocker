@@ -15,7 +15,7 @@
 #
 # This script
 #  - loads some configuration from ./scripts/config.tex (can be overwritten with CONFIG_FILE)
-#  - for serving, also (basefolder)/.ximeraserve will be read (for GPG key settings)
+#  - for serving, also (basefolder)/$XM_KEYFILE (default .xmKeyFile) will be read (for GPG key settings)
 #  - starts a xake docker container (unless we're already IN a container)
 #  - starts (presumably) a container-specific version of this very script
 #  - that (presumably) starts xake with the arguments passed to this script
@@ -54,6 +54,7 @@ fi
 #
 # Which folder to mount INSIDE the container, under /code  (use with care: it should contain a build.sh !)
 : "${MOUNTDIR:=$(pwd)}"
+: "${XM_KEYFILE:=.xmKeyFile}"
 #
 # Which script to start inside the container; 
 : "${COMMAND:=xmlatex}"
@@ -431,13 +432,13 @@ then
     fi
 
     # If GPG_KEY_ID (and presumably GPG_KEY) are given, 
-    # ignore .ximeraserve, which should only be used for the DUMMY key ...
+    # ignore XM_KEYFILE, which probably should only be used for the DUMMY key ...
     if [[ -z "$GPG_KEY_ID" ]]
     then
-        if [[ -f .ximeraserve ]]
+        if [[ -f "$XM_KEYFILE" ]]
         then
-            echo "Using settings from .ximeraserve"
-            source .ximeraserve
+            echo "Using settings from $XM_KEYFILE"
+            source $XM_KEYFILE
 	        echo GPG_KEY_ID=$GPG_KEY_ID
 	        echo GPG_KEY=${GPG_KEY:0:10}...
             # : ${XIMERA_NAME:=$REPO_XIMERA}

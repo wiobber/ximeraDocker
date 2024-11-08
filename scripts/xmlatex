@@ -282,8 +282,9 @@ then
     debug pdflatex -file-line-error -shell-escape "\\PassOptionsToClass{tikzexport}{ximera}\\PassOptionsToClass{xake}{ximera}\\PassOptionsToClass{xake}{xourse}\\nonstopmode\\input{$FILE}"
           pdflatex -file-line-error -shell-escape "\\PassOptionsToClass{tikzexport}{ximera}\\PassOptionsToClass{xake}{ximera}\\PassOptionsToClass{xake}{xourse}\\nonstopmode\\input{$FILE}"
 
-    debug make4ht -s -c ximera -f html5+dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" 
-          make4ht -s -c ximera -f html5+dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
+# Option 'tikz+' : USE dvips  (and not dvisvg)
+    debug make4ht -s -c ximera -f html5+dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info,tikz+" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" 
+          make4ht -s -c ximera -f html5+dvisvgm_hashes -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info,tikz+" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
 #          make4ht -s -c ximera -f xhtml -u  -a debug $FILE "svg,htex4ht,mathjax,-css,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
     # make4ht -s -c ximera -f xhtml+tidy -u  -a debug $FILE "svg,htex4ht, mathjax,-css,Gin-percent,info" "" "" "--interaction=nonstopmode -shell-escape -file-line-error" | tee $FILE.log
     # make4ht  $FILE "ximera,charset=utf-8,-css" "-cunihtf -utf8" "" "--interaction=nonstopmode -shell-escape -file-line-error"
@@ -512,6 +513,10 @@ then
     # '**F**rost' allows frosting with uncommitted changes...? Should not be done 'in production'.
     # 'xake frost' builds metadata.json and tag for publishing
     # 'xake Frost' does the same, but ignores 'not committed' errors (with xake version of 2024-10)
+
+    # set git name and email if not yet set (e.g. in vanilla docker container)
+    git config  --get user.name  || git config user.name "xmlatex Xake"
+    git config  --get user.email || git config user.email "xmlatex@xakecontainer"
 
     echo "Doing $XAKE $FROST"
     $XAKE $FROST || error "xake $FROST failed, you might want to set XM_FROST_WITH_UNCOMMITTED_CHANGED (e.g. in config.txt)"  

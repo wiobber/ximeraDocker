@@ -86,8 +86,8 @@ RUN git pull && git checkout development
 ADD scripts/xmlatex /usr/local/bin/xmlatex
 RUN ln -s /root/go/bin/xake /usr/local/bin/xake
 
-RUN git config --global user.name "Xake Container"
-RUN git config --global user.email "xake@xake.test" 
+# RUN git config --global user.name "Xake Container"
+# RUN git config --global user.email "xake@xake.test" 
 
 RUN git config --global --add safe.directory /code
 

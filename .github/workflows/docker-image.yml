@@ -23,6 +23,7 @@ jobs:
         restore-keys: |
           buildx-cache-${{ github.sha }}
           buildx-cache-
+          buildx
 
     # Step 3: Check out the repository
     - name: Checkout repository

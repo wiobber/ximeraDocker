@@ -1,5 +1,4 @@
 FROM registry.gitlab.com/islandoftex/images/texlive:TL2024-2024-09-15-medium
-RUN echo brol
 
 RUN apt-get update -y  
 
@@ -31,7 +30,5 @@ RUN git pull && git checkout development
 ADD scripts/xmlatex /usr/local/bin/xmlatex
 
 RUN git config --global --add safe.directory /code
-
-
 
 WORKDIR /code

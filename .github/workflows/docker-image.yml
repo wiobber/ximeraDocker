@@ -21,7 +21,7 @@ jobs:
         path: /tmp/.buildx-cache
         key: buildx-cache-${{ github.sha }}
         restore-keys: |
-          buildx-cache-${{ github.sha }
+          buildx-cache-${{ github.sha }}
           buildx-cache-
 
     # Step 3: Check out the repository
@@ -61,9 +61,9 @@ jobs:
     - name: Debug cache
       run: ls -l /tmp/.buildx-cache
 
-    - name: Save cache
-      uses: actions/cache@v4
-      with:
-        path: /tmp/.buildx-cache
-        key: buildx-cache-${{ github.sha }}-saved
+    # - name: Save cache
+    #   uses: actions/cache@v4
+    #   with:
+    #     path: /tmp/.buildx-cache
+    #     key: buildx-cache-${{ github.sha }}-saved
           

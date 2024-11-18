@@ -23,7 +23,8 @@ jobs:
     # - name: Build the Docker image 2023
     #   run: docker build . --file xake/Dockerfile.2023 --tag ghcr.io/ximeraproject/xake2023:latest
     - name: Build the Docker image 2024
-      run: docker build . --file xake/Dockerfile.2024 --tag ghcr.io/ximeraproject/xake2024:build
+      run: docker build . --file xake/Dockerfile.2024medium --tag ghcr.io/wiobber/xake2024:buildm
+      # run: docker build . --file xake/Dockerfile.2024medium --tag ghcr.io/ximeraproject/xake2024:buildm
 
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -32,6 +33,9 @@ jobs:
     #   run: docker push ghcr.io/ximeraproject/xake2019:latest
     # - name: Push xake2023:latest
     #   run: docker push ghcr.io/ximeraproject/xake2023:latest
+    - name: Push xake2024:build
+      run: docker push ghcr.io/wiobber/xake2024:buildm
+
     - name: Push xake2024:build
       run: docker push ghcr.io/ximeraproject/xake2024:build
       # re-tag manually if and when needed for now ...

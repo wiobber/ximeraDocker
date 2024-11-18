@@ -42,7 +42,7 @@ jobs:
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:build{{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:build${{ github.ref_name }} \
           --file xake/Dockerfile.2024 \
           --push .
 
@@ -52,7 +52,7 @@ jobs:
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:buildm{{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:buildm${{ github.ref_name }} \
           --file xake/Dockerfile.2024medium \
           --push .
 

@@ -37,25 +37,28 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     # Step 5: Build and push the Docker image with caching
-    - name: Build and Push Docker image
+    - name: Build and Push full Docker image
       run: |
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:build${{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:full_${{ github.ref_name }} \
           --file xake/Dockerfile.2024 \
           --push .
 
     # Step 5: Build and push the Docker image with caching
-    - name: Build and Push Docker image
+    - name: Build and Push medium Docker image
       run: |
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:buildm${{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:medium_${{ github.ref_name }} \
           --file xake/Dockerfile.2024medium \
           --push .
 
-    - name: Push xake2024:build
-      run: docker push ghcr.io/wiobber/xake2024:build
+    - name: Push medium
+      run: docker push ghcr.io/wiobber/xake2024:medium_${{ github.ref_name }}
+
+    - name: Push full
+      run: docker push ghcr.io/wiobber/xake2024:full_${{ github.ref_name }}
      

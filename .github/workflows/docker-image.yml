@@ -1,9 +1,4 @@
-name: Build and Publish Docker Image on Release
-
-# on:
-#   release:
-#     types:
-#       - published
+name: Build and Publish Docker Image on Tag
 
 on:
   push:
@@ -48,25 +43,19 @@ jobs:
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:full_${{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:${{ github.ref_name }}-full \
           --file xake/Dockerfile.2024 \
           --push .
 
-    # Step 5: Build and push the Docker image with caching
+    # Step 5medium: Build and push the Docker image with caching
     - name: Build and Push medium Docker image
       run: |
         docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-          --tag ghcr.io/wiobber/xake2024:medium_${{ github.ref_name }} \
+          --tag ghcr.io/wiobber/xake2024:${{ github.ref_name }}-medium \
           --file xake/Dockerfile.2024medium \
           --push .
-
-    # - name: Push medium
-    #   run: docker push ghcr.io/wiobber/xake2024:medium_${{ github.ref_name }}
-
-    # - name: Push full
-    #   run: docker push ghcr.io/wiobber/xake2024:full_${{ github.ref_name }}
 
     - name: Debug cache
       run: ls -l /tmp/.buildx-cache

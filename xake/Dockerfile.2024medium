@@ -1,4 +1,3 @@
-# FROM texlive/texlive
 FROM registry.gitlab.com/islandoftex/images/texlive:TL2024-2024-09-15-medium
 RUN echo brol
 
@@ -11,6 +10,16 @@ RUN apt-get install -y \
     gnupg \
     vim wget strace less 
 
+
+# Install xake (from repo)
+ADD scripts/xake.bin /usr/local/bin/xake
+
+# Extra packages (on top of 'medium')
+RUN tlmgr install \
+    circuitikz \
+    tikz-3dplot tikz-cd tkz-euclide \
+    xstring
+
 # Add ximeraLatex repo
 RUN mkdir -p /root/texmf/tex/latex
 WORKDIR /root/texmf/tex/latex
@@ -20,10 +29,9 @@ WORKDIR /root/texmf/tex/latex/ximeraLatex
 RUN git pull && git checkout development
 
 ADD scripts/xmlatex /usr/local/bin/xmlatex
-ADD scripts/xake.bin /usr/local/bin/xake
 
-# RUN git config --global user.name "Xake Container"
-# RUN git config --global user.email "xake@xake.test" 
 RUN git config --global --add safe.directory /code
+
+
 
 WORKDIR /code
